@@ -1,0 +1,10 @@
+<div class="ds-avatar" 
+     [class.ds-avatar--small]="size === 'small'"
+     [class.ds-avatar--large]="size === 'large'">
+
+  <img *ngIf="src" [src]="src" [alt]="alt" class="ds-avatar__image">
+
+  <div *ngIf="!src && name" class="ds-avatar__fallback">
+    {{ getInitials() }}
+  </div>
+</div>

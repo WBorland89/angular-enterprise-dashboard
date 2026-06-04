@@ -1,0 +1,21 @@
+<div *ngIf="isOpen" class="ds-modal-overlay" (click)="onClose()">
+  <div class="ds-modal" 
+       [class.ds-modal--small]="size === 'small'"
+       [class.ds-modal--large]="size === 'large'"
+       (click)="$event.stopPropagation()">
+
+    <div class="ds-modal__header">
+      <h2>{{ title }}</h2>
+      <ds-button variant="ghost" size="small" (onClick)="onClose()">✕</ds-button>
+    </div>
+
+    <div class="ds-modal__content">
+      <ng-content></ng-content>
+    </div>
+
+    <div class="ds-modal__footer">
+      <ds-button variant="secondary" (onClick)="onClose()">Cancel</ds-button>
+      <ds-button variant="primary" (onClick)="onSave()">Save</ds-button>
+    </div>
+  </div>
+</div>

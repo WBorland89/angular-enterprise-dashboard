@@ -1,0 +1,17 @@
+<div class="ds-card" 
+     [class.ds-card--flat]="elevation === 'flat'"
+     [class.ds-card--raised]="elevation === 'raised'"
+     [class.ds-card--elevated]="elevation === 'elevated'"
+     [class.ds-card--clickable]="clickable"
+     [class.ds-card--padding-small]="padding === 'small'"
+     [class.ds-card--padding-large]="padding === 'large'">
+
+  <div *ngIf="title" class="ds-card__header">
+    <h3 class="ds-card__title">{{ title }}</h3>
+    <p *ngIf="subtitle" class="ds-card__subtitle">{{ subtitle }}</p>
+  </div>
+
+  <div class="ds-card__content">
+    <ng-content></ng-content>
+  </div>
+</div>

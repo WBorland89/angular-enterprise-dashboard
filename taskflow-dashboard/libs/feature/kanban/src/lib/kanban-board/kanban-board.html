@@ -1,0 +1,58 @@
+<div class="kanban-board">
+  <div class="kanban-header">
+    <h1>TaskFlow</h1>
+    <ds-button variant="primary" (onClick)="openNewTaskModal()">
+      + New Task
+    </ds-button>
+  </div>
+
+  <div class="kanban-columns">
+    <div *ngFor="let key of columnKeys" class="kanban-column">
+      <h2>{{ columnTitles[key] }} ({{ getColumnData(key).length }})</h2>
+      
+      <div 
+        class="task-list"
+        cdkDropList
+        [cdkDropListData]="getColumnData(key)"
+        (cdkDropListDropped)="drop($event, key)">
+        
+        <ds-card 
+          *ngFor="let task of getColumnData(key)"
+          cdkDrag 
+          class="task-card">
+          <div class="task-header">
+            <ds-badge [variant]="task.priority === 'high' ? 'danger' : task.priority === 'medium' ? 'warning' : 'secondary'">
+              {{ task.priority }}
+            </ds-badge>
+            <ds-avatar *ngIf="task.assignee" [name]="task.assignee" size="small"></ds-avatar>
+          </div>
+          <h3 class="task-title">{{ task.title }}</h3>
+        </ds-card>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<ds-modal 
+  [isOpen]="isModalOpen" 
+  title="New Task"
+  (close)="closeModal()"
+  (save)="saveNewTask()">
+
+  <div>
+    <label>Task Title</label>
+    <input 
+      type="text" 
+      [(ngModel)]="newTaskTitle" 
+      placeholder="Enter task title"
+      style="width: 100%; padding: 10px; margin: 8px 0; border-radius: 6px; border: 1px solid #ccc;">
+    
+    <label>Priority</label>
+    <select [(ngModel)]="newTaskPriority" style="width: 100%; padding: 10px; margin: 8px 0;">
+      <option value="low">Low</option>
+      <option value="medium">Medium</option>
+      <option value="high">High</option>
+    </select>
+  </div>
+</ds-modal>
