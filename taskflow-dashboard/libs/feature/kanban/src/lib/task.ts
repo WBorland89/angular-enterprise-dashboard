@@ -1,66 +1,64 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
+import { ApiService } from './api';
 
 export interface Task {
-  id: number;
+  id: number | string;
   title: string;
   description?: string;
   assignee?: string;
   priority: 'low' | 'medium' | 'high';
   status: 'todo' | 'inProgress' | 'review' | 'done';
+  createdAt?: string;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class TaskService {
-  private tasks = signal<Task[]>([
-    { 
-      id: 1, 
-      title: 'Implement login page', 
-      priority: 'high' as const, 
-      assignee: 'Wesley', 
-      status: 'todo' 
-    },
-    { 
-      id: 2, 
-      title: 'Setup dark mode toggle', 
-      priority: 'medium' as const, 
-      status: 'todo' 
-    },
-    { 
-      id: 3, 
-      title: 'Create design system components', 
-      priority: 'high' as const, 
-      assignee: 'Wesley', 
-      status: 'inProgress' 
-    },
-    { 
-      id: 4, 
-      title: 'Setup Nx workspace', 
-      priority: 'low' as const, 
-      status: 'done' 
-    },
-  ]);
+  private api = inject(ApiService);
+
+  private tasks = signal<Task[]>([]);
 
   readonly tasks$ = this.tasks.asReadonly();
+
+  constructor() {
+    this.loadTasks();
+  }
+
+  private async loadTasks() {
+    try {
+      const tasks = await this.api.getTasks().toPromise();
+      this.tasks.set(tasks || []);
+    } catch (error) {
+      console.warn('Backend not available, using mock data');
+      this.tasks.set([
+        { id: 1, title: 'Implement login page', priority: 'high', assignee: 'Wesley', status: 'todo' },
+        { id: 2, title: 'Setup dark mode', priority: 'medium', status: 'todo' },
+        { id: 3, title: 'Create design system', priority: 'high', assignee: 'Wesley', status: 'inProgress' },
+      ]);
+    }
+  }
 
   getTasksByStatus(status: Task['status']): Task[] {
     return this.tasks().filter(task => task.status === status);
   }
 
-  moveTask(taskId: number, newStatus: Task['status']) {
+  async addTask(task: Omit<Task, 'id' | 'createdAt'>) {
+    try {
+      const newTask = await this.api.createTask(task).toPromise();
+      this.tasks.update(tasks => [...tasks, newTask!]);
+    } catch (error) {
+      console.error('Failed to create task', error);
+    }
+  }
+
+  moveTask(taskId: number | string, newStatus: Task['status']) {
     this.tasks.update(tasks =>
       tasks.map(task =>
         task.id === taskId ? { ...task, status: newStatus } : task
       )
     );
-  }
 
-  addTask(task: Omit<Task, 'id'>) {
-    const newTask: Task = {
-      ...task,
-      id: Math.max(0, ...this.tasks().map(t => t.id)) + 1
-    };
-    this.tasks.update(tasks => [...tasks, newTask]);
+    // Need to implement PUT backend endpoint call later;
   }
 }

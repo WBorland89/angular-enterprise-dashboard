@@ -12,16 +12,7 @@ import { TaskService, Task } from '../task';
 @Component({
   selector: 'app-kanban-board',
   standalone: true,
-  imports: [
-    CommonModule, 
-    FormsModule, 
-    DragDropModule, 
-    CardComponent, 
-    DsButtonComponent, 
-    BadgeComponent,
-    AvatarComponent,
-    ModalComponent
-  ],
+  imports: [CommonModule, FormsModule, DragDropModule, CardComponent, DsButtonComponent, ModalComponent, BadgeComponent, AvatarComponent],
   templateUrl: './kanban-board.html',
   styleUrl: './kanban-board.scss'
 })
@@ -55,9 +46,9 @@ export class KanbanBoardComponent {
     this.isModalOpen = false;
   }
 
-  saveNewTask() {
+  async saveNewTask() {
     if (this.newTaskTitle.trim()) {
-      this.taskService.addTask({
+      await this.taskService.addTask({
         title: this.newTaskTitle.trim(),
         priority: this.newTaskPriority,
         status: 'todo'
